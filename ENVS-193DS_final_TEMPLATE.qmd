@@ -1,0 +1,37 @@
+---
+title: "ENVS 193DS - Spring Final"
+author: "Sascha Roberts"
+date: "2026-06-09"
+format: pdf
+---
+
+# Github Repo
+
+My repo [here](https://github.com/Sascharr16/ENVS-193DS_spring-2026_final/tree/main)
+
+# Set Up
+
+## Load packages
+
+```{r}
+#| label: load_packages
+#| message: false
+
+
+
+```
+
+## Load data
+
+```{r}
+#| label: load_data
+#| message: false
+
+
+
+```
+
+
+
+
+
