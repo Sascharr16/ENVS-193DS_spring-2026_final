@@ -17,7 +17,10 @@ My repo [here](https://github.com/Sascharr16/ENVS-193DS_spring-2026_final/tree/m
 #| label: load_packages
 #| message: false
 
-
+library (tidyverse)
+library (here)
+library (janitor)
+library (rstatix)
 
 ```
 
@@ -27,11 +30,146 @@ My repo [here](https://github.com/Sascharr16/ENVS-193DS_spring-2026_final/tree/m
 #| label: load_data
 #| message: false
 
-
+bike_commute <- read.csv(here("data","ENVS_193DS_Personal_Data.csv"))
 
 ```
 
+# Problem 1. Research writing
+
+## a. Transparent statistical methods
+
+In part 1, my coworker used _______. In part 2, they used _______.
+
+## b. Suggestions for rewriting
 
 
 
+## c. Further analysis
+
+
+
+# Problem 2. Data analysis
+
+## a. Clean and wrangle
+
+
+
+## b. Response variable
+
+
+
+## c. Purpose of study
+
+
+
+## d. Table of models
+
+
+
+## e. Run the models
+
+
+
+## f. Select the best model
+
+
+
+## g. Check the diagnostics
+
+
+
+## h. Visualize the model predictions
+
+
+
+## i. Write a caption for your figure.
+
+
+
+## j. Calculate model predictions
+
+
+
+## k. Interpret your results
+
+
+
+# Problem 3. Affective and exploratory visualizations
+
+## a. Comparing visualizations
+
+- My affective visualization does not include each individual observation as a data point like my exploratory data visualization does from homework 2. Instead, my affective visualization uses a bike path visual that represent the trend of the data and includes bikers overlaid to represent clusters of data points along the line.
+- Both visualizations exhibit a clear positive linear shape that can be used to infer the relationship I discovered between bike commute duration and commute urgency. 
+- Between both visualizations, there is a clear relationship between bike commute duration and commute urgency. The less time I have before class when I leave home, the quicker I bike from home to campus. 
+- One piece of helpful feedback I received in workshop was that the way I represented outliers with the same object as my trendline was distracting and confusing, and I used this suggestion to create a more cohesive visualization by changing this representation. I also was recommended to better differentiate the bikers on the bottom left of my trendline to better represent that they are moving faster than other "points". I utilized this suggestion by adding dust clouds behind the "faster" bikers. 
+
+
+## b. Designing an analysis
+
+One statistical analysis that I could use to answer my research question is a linear model (linear regression). Because my central question of my data collection is; "How does the amount of time I leave my house before class effect the duration of my bike commute?", I can use a linear model to display this predicative relationship. My predictor variable is how much time I have from when I leave home until class start (minutes), and my response variable is the duration of bike commute (minutes). Both of these variables are continuous. I would expect these two variable to be connected and observe that my urgency to get to class predicts how quickly I ride my bike.
+
+
+## c. Check any assumptions and run your analysis
+
+### Visualize data
+
+```{r}
+#| label: personal_data_visualization
+
+# base layer: ggplot
+# data frame: bike_commute
+ggplot (data = bike_commute,
+mapping = aes(
+# x-axis: amount of time before class
+# y-axis: duration of commute
+x =
+`time_before_class_(min)`
+,
+`duration_(m)`
+y =
+)) +
+8
+# first layer: point = scatterplot
+# make data points colored, change shape
+geom_point(color = "blue3",
+shape = 21) +
+# add reference linear line that fits model, make line a lighter blue
+geom_smooth(method = "lm", se = FALSE,
+color = "deepskyblue") +
+# Changed title, x and y-axis
+labs (title = "Urgency of Classtime Bike Commute",
+x = "Amount of Time Before Class",
+y = "Duration of Commute (minutes)",
+subtitle = "2026-05-28") +
+# applied custom plot theme
+theme_bw() +
+# removing the panel background
+theme(panel.background = element_blank()) +
+# removing the panel grid
+theme(panel.grid = element_blank()) +
+# removing axis ticks
+theme(axis.ticks = element_blank())
+```
+
+
+### Indpendent observations
+
+My data has indepredent observations. Each individual observation is independent of the obseravtions beofre that. My bike commute duration to class one day, does not effect my next commute duration.
+
+#### 
+
+
+## d. Create a visualization
+
+
+
+## e. Write a caption
+
+
+
+## f. Write about your results
+
+
+
+## Sharing your affective visualization
 
