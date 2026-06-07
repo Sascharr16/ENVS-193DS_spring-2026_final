@@ -17,10 +17,12 @@ My repo [here](https://github.com/Sascharr16/ENVS-193DS_spring-2026_final/tree/m
 #| label: load_packages
 #| message: false
 
+# load in packages
 library (tidyverse)
 library (here)
 library (janitor)
 library (rstatix)
+library (ggeffects)
 
 ```
 
@@ -30,6 +32,7 @@ library (rstatix)
 #| label: load_data
 #| message: false
 
+# create object for bike commute data
 bike_commute <- read.csv(here("data","ENVS_193DS_Personal_Data.csv"))
 
 ```
@@ -111,56 +114,153 @@ One statistical analysis that I could use to answer my research question is a li
 
 ## c. Check any assumptions and run your analysis
 
+### Clean data
+
+```{r}
+#| label: clean_bike_data
+
+# create new object for clean data
+bike_commute_clean <- bike_commute |> 
+  # clean column names
+  clean_names() |> 
+  # select columns of interest 
+  select(duration_m,
+         time_before_class_min)
+
+```
+
+
 ### Visualize data
 
 ```{r}
 #| label: personal_data_visualization
 
 # base layer: ggplot
-# data frame: bike_commute
-ggplot (data = bike_commute,
-mapping = aes(
-# x-axis: amount of time before class
-# y-axis: duration of commute
-x =
-`time_before_class_(min)`
-,
-`duration_(m)`
-y =
-)) +
-8
-# first layer: point = scatterplot
-# make data points colored, change shape
-geom_point(color = "blue3",
-shape = 21) +
-# add reference linear line that fits model, make line a lighter blue
-geom_smooth(method = "lm", se = FALSE,
-color = "deepskyblue") +
-# Changed title, x and y-axis
-labs (title = "Urgency of Classtime Bike Commute",
-x = "Amount of Time Before Class",
-y = "Duration of Commute (minutes)",
-subtitle = "2026-05-28") +
-# applied custom plot theme
-theme_bw() +
-# removing the panel background
-theme(panel.background = element_blank()) +
-# removing the panel grid
-theme(panel.grid = element_blank()) +
-# removing axis ticks
-theme(axis.ticks = element_blank())
+# data frame: bike_commute_clean
+ggplot (data = bike_commute_clean,
+      mapping = aes(
+      # x-axis: amount of time before class
+      # y-axis: duration of commute
+      x = time_before_class_min,
+      y = duration_m)) +
+  # first layer: point = scatterplot
+  # make data points colored, change shape
+  geom_point(color = "blue3",
+             shape = 21) +
+  # Changed title, x and y-axis
+  labs (title = "Urgency of Classtime Bike Commute",
+        x = "Amount of Time Before Class",
+        y = "Duration of Commute (minutes)") +
+  # applied custom plot theme
+  theme_bw() +
+  # removing the panel background
+  theme(panel.background = element_blank()) +
+  # removing the panel grid
+  theme(panel.grid = element_blank()) +
+  # removing axis ticks
+  theme(axis.ticks = element_blank())
 ```
 
 
-### Indpendent observations
+### Independent observations
 
-My data has indepredent observations. Each individual observation is independent of the obseravtions beofre that. My bike commute duration to class one day, does not effect my next commute duration.
+My data has independent observations. Each individual observation is independent of the observations before that. My bike commute duration to class one day, does not effect my next commute duration.
 
-#### 
+### Write out model
 
+```{r}
+#| label: fit_bike_model
+
+# create new object for bike commute
+bike_commute_model <- lm (duration_m ~ time_before_class_min, # duration as a function of time before class
+                          data = bike_commute_clean) # data: bike_commute_clean
+
+```
+
+### Check assumptions with diagnostic plots
+
+```{r}
+#| label: diagnostic_plots
+
+# display diagnostic plots in 2 by 2 grid
+par (mfrow = c(2, 2))
+# plot bike commute model
+plot (bike_commute_model)
+
+
+```
+
+**Note:** Using the "Residuals vs Fitted" and "Scale-Location" plots, we can determine that the residuals are evenly distributed and have constant variance (homoscedasticity). Using the "QQ Residuals" plot we can determine that the residuals are normally distributed. Finally, using the "Residual vs Leverage" plot, we can determine that there are no outliers that are influencing our model. 
+
+**All assumptions are met**
+
+### Model summary
+
+```{r}
+#| label: commute_model_summary
+
+#bike commute model summary
+summary (bike_commute_model)
+
+```
+
+Intercept: $0.36905 \pm 0.4897$
+
+Slope: $0.50063 \pm 0.0473$
+
+Adjusted R-squared: 0.8538
+
+P-value: p < 0.0001
 
 ## d. Create a visualization
 
+### Model predictions
+
+```{r}
+#| label: commute_predictions
+
+# new object call bike_commute_preds
+bike_commute_preds <- ggpredict (bike_commute_model, # model object
+                                 terms = "time_before_class_min") # predictor
+
+# display the predictions
+bike_commute_preds
+```
+
+### Visualization
+
+```{r}
+#| label: bike_commute_final_visualization
+
+# base layer: ggplot
+# using clean data frame
+ggplot(data = bike_commute_clean,
+       aes(x = time_before_class_min,
+           y = duration_m)) +
+  # first layer: points representing individual observations
+  geom_point(size = 2,
+             stroke = 0.5,
+             fill = "cyan4",
+             shape = 21) +
+  # second layer: ribbon representing confidence interval
+  # using predictions data frame
+  geom_ribbon(data = bike_commute_preds,
+              aes(x = x,
+                  y = predicted,
+                  ymin = conf.low,
+                  ymax = conf.high),
+              alpha = 0.1) +
+  # third layer: line representing model predictions
+  # using predictions data frame
+  geom_line(data = bike_commute_preds,
+            aes(x = x,
+                y = predicted)) +
+  # axis labels
+  labs(x = "Amount of Time Before Class (minutes)", 
+       y = "Duration of Commute (minutes)") +
+  # theme
+  theme_minimal()
+```
 
 
 ## e. Write a caption
