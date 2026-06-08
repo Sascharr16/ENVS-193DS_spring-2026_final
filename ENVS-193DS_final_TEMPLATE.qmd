@@ -23,6 +23,9 @@ library (here)
 library (janitor)
 library (rstatix)
 library (ggeffects)
+library (scales)
+library (MuMIn)
+library (DHARMa)
 
 ```
 
@@ -76,26 +79,77 @@ slice_sample(nests_clean, n = 10)
 ```
 
 
-
 ## b. Response variable
 
-
+The response variable case_control is binomial and looks at whether a tree contained a nest or if it was was an "available" tree. If the tree contained a nest, it recieved a "1", and if the tree did not contain a nest, it recieved a "0".
 
 ## c. Purpose of study
 
-
+- Tree height is a continuous predictor variable that is measured in cm. As tree height increases, the probability of nest occurrence most likely increases because the birds will be able to nest farther away from potential predators on the ground. **Finish this with citations**
+- Acacia ant species is a categorical predictor variable with 3 levels: Crematogaster sjostedti (AB), Crematogaster mimosae (RRB), and Crematogaster nigriceps (BBR).
 
 ## d. Table of models
 
+| Model number | Tree Height (cm) | Ant Species | Predictor list              |  
+|--------------|:----------------:|------------:|:---------------------------:|  
+| 0            |                  |             | no predictors (null model)  |
+| 1            |        X         |      X      | all predictors (full model) | 
+| 2            |        X         |             | Tree Height                 |   
+| 3            |                  |      X      | Ant Species                 |    
 
 
 ## e. Run the models
 
+```{r}
+#| label: model_fitting
+
+# model 0: null model
+model0 <- lm (
+  case_control ~ 1, # fromula: no predictors
+  data = nests_clean # data = clean
+)
+
+# model 1: all predictors
+model1 <- lm (
+  # formula: case_control as a function of tree height + ant species
+  case_control ~ height_cm + ant_species, 
+  data = nests_clean
+)
+
+# model 2: Tree height
+model2 <- lm (
+  # formula: case_control as a function of tree height
+  case_control ~ height_cm,
+  data = nests_clean
+)
+
+# model 3: Ant species
+model3 <- lm (
+  # formula: case_control as a function of ant species
+  case_control ~ ant_species,
+  data = nests_clean
+)
+
+```
 
 
 ## f. Select the best model
 
+```{r}
+#| label: calculating_aic
 
+# calculating AIC
+AICc (
+  model0,
+  model1,
+  model2,
+  model3
+) |> 
+  # arranging output in order of AIC
+  arrange (AICc)
+```
+
+The best model as determined by Akaike’s Information Criterion (AIC) is model 1; the full model including "case_control" as a function of all predictors (tree height and ant species). This model explains the most variation in the simplest way.
 
 ## g. Check the diagnostics
 
