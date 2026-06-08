@@ -32,8 +32,9 @@ library (ggeffects)
 #| label: load_data
 #| message: false
 
+nests <- read.csv (here("data", "nest_data_final.csv"))
 # create object for bike commute data
-bike_commute <- read.csv(here("data","ENVS_193DS_Personal_Data.csv"))
+bike_commute <- read.csv(here("data", "ENVS_193DS_Personal_Data.csv"))
 
 ```
 
@@ -54,6 +55,25 @@ In part 1, my coworker used _______. In part 2, they used _______.
 # Problem 2. Data analysis
 
 ## a. Clean and wrangle
+
+```{r}
+#| label: clean_nest_data
+
+nests_clean <- nests |> 
+  # select columns of interest 
+  select (height_cm, case_control, ant_species) |> 
+  # filter to only include ant species C. mimosae, C. sjostedti, and C. nigriceps
+  filter (ant_species %in% c ("AB", "RRB", "BBR")) |> 
+  # relevel ant species to be in the following order: 1) C. sjostedti, 2) C. mimosae, 3) C. nigriceps
+  mutate (ant_species = fct_relevel (ant_species, "AB", "RRB", "BBR")) |> 
+  # create a new column to store the full scientific name for each ant species
+  mutate (scientific_name = case_when (
+      ant_species == "AB"  ~ "Crematogaster sjostedti",
+      ant_species == "RRB" ~ "Crematogaster mimosae",
+      ant_species == "BBR" ~ "Crematogaster nigriceps"))
+
+slice_sample(nests_clean, n = 10)
+```
 
 
 
@@ -204,6 +224,8 @@ summary (bike_commute_model)
 
 ```
 
+**Note:**
+
 Intercept: $0.36905 \pm 0.4897$
 
 Slope: $0.50063 \pm 0.0473$
@@ -218,6 +240,7 @@ P-value: p < 0.0001
 
 ```{r}
 #| label: commute_predictions
+#| message: false
 
 # new object call bike_commute_preds
 bike_commute_preds <- ggpredict (bike_commute_model, # model object
@@ -256,7 +279,8 @@ ggplot(data = bike_commute_clean,
             aes(x = x,
                 y = predicted)) +
   # axis labels
-  labs(x = "Amount of Time Before Class (minutes)", 
+  labs( title = "Higher urgency predicts shorter bike commute duration",
+       x = "Amount of Time Before Class Starts (minutes)", 
        y = "Duration of Commute (minutes)") +
   # theme
   theme_minimal()
@@ -265,11 +289,15 @@ ggplot(data = bike_commute_clean,
 
 ## e. Write a caption
 
-
+**Figure 2: Leaving home with less time before class predicts a shorter bike commute** Visualization displays linear relationship between the "Amount of Time Before Class Starts (minutes)" on the x-axis, and the "Duration of Commute (minutes)" on the y-axis. Blue points represent individual bike commute observations. Line represents model predictions, and ribbon displays 95% confidence interval.
 
 ## f. Write about your results
 
+My biking commute duration increased as the amount of time I had before class increased (linear regression, F(1, 18) = 112, p < 0.0001, $\alpha$ = 0.05). 85% ($R^2$ = 0.85) of the variation in the model can be explained the predictor.
 
+Based on model predictions, for every 1 minute increase in available time before class starts, I expect an increase in commute duration of $0.5 \pm 0.047$ (SE) minutes.
 
-## Sharing your affective visualization
+## g. Sharing your affective visualization
+
+I attended week 10 workshop! :)
 
