@@ -85,6 +85,10 @@ nests_clean <- nests |>
       ant_species == "RRB" ~ "Crematogaster mimosae",
       ant_species == "BBR" ~ "Crematogaster nigriceps"))
 
+# structuring clean data
+str (nests_clean)
+
+# display 10 observations from nest_clean
 slice_sample(nests_clean, n = 10)
 ```
 
@@ -95,50 +99,40 @@ The response variable case_control is binomial and looks at whether a tree conta
 
 ## c. Purpose of study
 
-- Tree height is a continuous predictor variable that is measured in cm. As tree height increases, the probability of nest occurrence most likely increases because the birds will be able to nest farther away from potential predators on the ground. **Finish this with citations**
-- Acacia ant species is a categorical predictor variable with 3 levels: Crematogaster sjostedti (AB), Crematogaster mimosae (RRB), and Crematogaster nigriceps (BBR).
+- Tree height is a continuous predictor variable that is measured in cm. As tree height increases, the probability of nest occurrence most likely increases because the birds will be able to nest farther away from potential predators on the ground (Abstract & Intro pragraph 1).
+- Acacia ant species is a categorical predictor variable with 3 levels: Crematogaster sjostedti (AB), Crematogaster mimosae (RRB), and Crematogaster nigriceps (BBR). It could influence the probabilty of birds nesting in the tree because some ant species are symbiont ants tolerating nesting birds, but other ant species can be hostile to "browsing animals" (introduction, paragraph 4).
 
 ## d. Table of models
 
-| Model number | Tree Height (cm) | Ant Species | Predictor list              |  
-|--------------|:----------------:|------------:|:---------------------------:|  
-| 0            |                  |             | no predictors (null model)  |
-| 1            |        X         |      X      | all predictors (full model) | 
-| 2            |        X         |             | Tree Height                 |   
-| 3            |                  |      X      | Ant Species                 |    
+| Model number | Tree Height (cm) | Ant Species | Model description                 |  
+|--------------|:----------------:|------------:|:---------------------------------:|
+| 1            |        X         |      X      | All predictors (No interaction)   | 
+| 2            |        X         |      X      | All predictors (Interaction term) |   
+  
 
 
 ## e. Run the models
 
 ```{r}
 #| label: model_fitting
+#| output: false
 
-# model 0: null model
-model0 <- lm (
-  case_control ~ 1, # fromula: no predictors
-  data = nests_clean # data = clean
-)
-
-# model 1: all predictors
-model1 <- lm (
+# model 1: all predictors, no interaction
+model1 <- glm (
   # formula: case_control as a function of tree height + ant species
   case_control ~ height_cm + ant_species, 
-  data = nests_clean
+  data = nests_clean, # data = nests_clean
+  family = binomial # response variable is binomial
 )
 
-# model 2: Tree height
-model2 <- lm (
-  # formula: case_control as a function of tree height
-  case_control ~ height_cm,
-  data = nests_clean
+# model 2: all predictors, interaction term
+model2 <- glm (
+  # formula: case_control as a function of tree height * ant species
+  case_control ~ height_cm * ant_species,
+  data = nests_clean, # data = nests_clean
+  family = binomial # response variable is binomial
 )
 
-# model 3: Ant species
-model3 <- lm (
-  # formula: case_control as a function of ant species
-  case_control ~ ant_species,
-  data = nests_clean
-)
 
 ```
 
@@ -150,28 +144,119 @@ model3 <- lm (
 
 # calculating AIC
 AICc (
-  model0,
   model1,
-  model2,
-  model3
+  model2
 ) |> 
   # arranging output in order of AIC
   arrange (AICc)
 ```
 
-The best model as determined by Akaike’s Information Criterion (AIC) is model 1; the full model including "case_control" as a function of all predictors (tree height and ant species). This model explains the most variation in the simplest way.
+The best model as determined by Akaike’s Information Criterion (AIC) is model 2. This model includes "case_control" as a function of all predictors (tree height and ant species) and uses an interaction term. This model explains the most variation in the simplest way.
 
 ## g. Check the diagnostics
 
+```{r}
+#| label: simulated_diagnostics
+#| fig-height: 6
+#| fig-width: 8
 
+# simulated residuals from GLM for diagnostic plots
+plot(simulateResiduals(model2))
+
+```
+
+Information from left plot (QQ plot residuals):
+- KS test: Residuals follow a uniform distribution.
+- Dispersion test: Residuals are not more dispersed than expected from a uniform
+distribution.
+- Outlier test: There are not outliers in the data set that could be influencing model
+coefficients or predictions
+Information from right plot (residuals vs predicted values):
+There are randomly arranged residuals across the range of predicted values. There are no significant problems detected.
 
 ## h. Visualize the model predictions
 
+```{r}
+#| label: nests_predictions
 
+# new object called nests preds
+nests_preds <- ggpredict (model2, # model2 object
+                          terms = c("height_cm [all]", "ant_species")) |> # prediction
+  rename(height_cm = x,
+         ant_species = group)
+                          
+```
+
+```{r}
+#| label: nests_visualization
+
+# baselayer: ggplot
+# data: nests clean
+ggplot( data = nests_clean,
+        mapping = aes (x = height_cm, # x-axis = height
+                       y = case_control)) + # y-axis = case_control
+  # first layer: geom_point
+  # Create point for individual binary observations
+  geom_point (aes (color = ant_species), # color by ant_species
+              shape = 21, # open circles 
+              alpha = 0.4) + # making circles transparent
+  # second layer: geom_line
+  # create line for predicted probability of nest occurence
+  geom_line (data = nests_preds, # data used is nests predictions
+             # line x = height_cm, y = predicted value
+             mapping = aes (x = height_cm, 
+                  y = predicted,
+                  color = ant_species), # colored by ant species 
+             # made line wider
+             linewidth = 2) +
+  # third layer: geom_ribbon
+  # create 95% CI interval
+  geom_ribbon (data = nests_preds, # data used is nests predictions
+              mapping = aes (
+                    y = predicted,
+                    ymin = conf.low, # bottom of CI interval
+                    ymax = conf.high, # top of CI interval 
+                    fill = ant_species), # fill with ant_species data
+               alpha = 0.1) + # make ribbon transparent
+  # created panels for each ant species
+  facet_wrap (~ ant_species,
+              # labelling each panel by species name
+              labeller = labeller (ant_species = c(
+               "AB" =  "Crematogaster sjostedti",
+               "RRB" = "Crematogaster mimosae",
+               "BBR" = "Crematogaster nigriceps")
+              )) +
+  # changed panels to custom colors for lines and points
+  scale_color_manual (values = c(
+    "AB" = "brown4",
+    "RRB" = "darkgreen",
+    "BBR" = "darkblue"
+  )) + 
+  # changed to custom colors for ribbons
+  scale_fill_manual (values = c (
+    "AB" = "brown4",
+    "RRB" = "darkgreen",
+    "BBR" = "darkblue"
+  )) + 
+  # set x axis range and breaks
+  scale_x_continuous (limits = c (0, 600),
+                      breaks = c (0, 200, 400, 600)) +
+  # relable x and y axis
+  labs (x = "Tree Height (cm)",
+        y = "Probabilioty of Nest Presence") + 
+  # changed theme
+  theme_minimal() + 
+  # remove grid lines
+  theme (panel.grid = element_blank ()) + 
+  # removed legend
+  theme (legend.position = "none")
+ 
+
+```
 
 ## i. Write a caption for your figure.
 
-
+Figure 1
 
 ## j. Calculate model predictions
 
@@ -265,6 +350,8 @@ bike_commute_model <- lm (duration_m ~ time_before_class_min, # duration as a fu
 
 ```{r}
 #| label: diagnostic_plots
+#| fig-height: 6
+#| fig-width: 8
 
 # display diagnostic plots in 2 by 2 grid
 par (mfrow = c(2, 2))
