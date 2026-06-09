@@ -12,7 +12,7 @@ execute:
 
 # Github Repo
 
-My repo [here](https://github.com/Sascharr16/ENVS-193DS_spring-2026_final/tree/main)
+My repo [here](https://github.com/Sascharr16/ENVS-193DS_spring-2026_final)
 
 # Set Up
 
@@ -101,7 +101,7 @@ The response variable case_control is binomial and looks at whether a tree conta
 
 ## c. Purpose of study
 
-- Tree height is a continuous predictor variable that is measured in cm. As tree height increases, the probability of nest occurrence most likely increases because the birds will be able to nest farther away from potential predators on the ground (introduction, pragraph 1, 3-4).
+- Tree height is a continuous predictor variable that is measured in cm. As tree height increases, the probability of nest occurrence most likely increases because the birds will be able to nest farther away from potential predators on the ground (Results, paragraph 2).
 - Acacia ant species is a categorical predictor variable with 3 levels: *Crematogaster sjostedti* (AB), *Crematogaster mimosae* (RRB), and *Crematogaster nigriceps* (BBR). It could influence the probabilty of birds nesting in the tree because some ant species are symbiont ants tolerating nesting birds as well as other predators, and other ant species can be hostile to "browsing animals" and predators (introduction, paragraph 2-3).
 
 ## d. Table of models
@@ -168,11 +168,15 @@ plot(simulateResiduals(model2))
 ```
 
 Information from left plot (QQ plot residuals):
+
 - KS test: Residuals follow a uniform distribution.
+
 - Dispersion test: Residuals are not more dispersed than expected from a uniform
 distribution.
+
 - Outlier test: There are not outliers in the data set that could be influencing model
-coefficients or predictions
+coefficients or predictions.
+
 Information from right plot (residuals vs predicted values):
 There are randomly arranged residuals across the range of predicted values. There are no significant problems detected.
 
@@ -259,7 +263,7 @@ ggplot( data = nests_clean,
 
 ## i. Write a caption for your figure.
 
-**Figure 1: The probability of a bird nest occurring in a tree increases as tree height increases across all 3 ant species presence.** The figure visualizes how the probability of nest presence (y-axis) is predicted by tree height in "cm" (x-axis) interacting with ant species (seperate panels). Open cirlces represent individual observation of binary presence or absence of tree nests on trees of a certain height, seperated by ant species. Colors correspond to ant species, Red panel: "*Crematogaster sjostedti*", green panel: "*Crematogaster mimosae*", blue panel: "*Crematogaster nigriceps*". Data sourced from: Cre Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: *Symbiotic acacia ants drive nesting behavior by birds in an African savanna* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
+**Figure 1: The probability of a bird nest occurring in a tree increases as tree height increases across all 3 ant species presence.** The figure visualizes how the probability of nest presence (y-axis) is predicted by tree height in "cm" (x-axis) interacting with ant species (seperate panels). Open cirlces represent individual observation of binary presence or absence of tree nests on trees of a certain height, seperated by ant species. Line in each panel describes model prediction of nest occurrence probability as tree height changes and ribbon describes the 95% confidence interval of this prediction. Colors correspond to ant species, Red panel: "*Crematogaster sjostedti*", green panel: "*Crematogaster mimosae*", blue panel: "*Crematogaster nigriceps*". Data sourced from: Cre Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: *Symbiotic acacia ants drive nesting behavior by birds in an African savanna* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
 
 ## j. Calculate model predictions
 
