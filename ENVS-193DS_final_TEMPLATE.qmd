@@ -51,7 +51,7 @@ bike_commute <- read.csv(here("data", "ENVS_193DS_Personal_Data.csv"))
 
 ## a. Transparent statistical methods
 
-In **part 1**, my coworker used a linear model (linear regression) to perform their analysis.The response variable is  binary and reflects the probability that the American Avocet uses the mirco habit (1) or doesn’t (0). The predictor is a continuous variable describing the distance to water edge (m). 
+In **part 1**, my coworker used a linear model (linear regression) to perform their analysis.The response variable is binary and reflects the probability that the American Avocet (*Recurvirostra americana*) uses the mirco habit (1) or doesn’t (0). The predictor is a continuous variable describing the distance to water edge (m). 
 
 In **part 2**, they used a chi-squared test for analysis to determine whether there is a relationship between two categorical variables. There categorical variables are bird species (American Avocet, Forster’s Tern, Black-necked Stilt) and habitat type (managed pond, non-tidal marsh, salt pond, tidal marsh, tidal mudflat). 
 
@@ -63,7 +63,7 @@ In **part 2**, they used a chi-squared test for analysis to determine whether th
 
 ## c. Further analysis
 
-Another variable that could influence the probability of American Avocet micro habitat use, is Salinity (ppt) which is a continuous variable that can be measured with a salinity meter. It might have an impact on micro-habitat use because salinity influences the composition and abundance of aquatic invertebrates which serve as prey for Avocets and therefore could predict Avocet distribution.
+Another variable that could influence the probability of American Avocet micro habitat use, is Salinity (ppt) which is a continuous variable that can be measured with a salinity meter. It might have an impact on micro-habitat use because salinity influences the composition and abundance of aquatic invertebrates which serve as prey for American Avocets and therefore could predict Avocet distribution.
 
 # Problem 2. Data analysis
 
@@ -75,9 +75,11 @@ Another variable that could influence the probability of American Avocet micro h
 nests_clean <- nests |> 
   # select columns of interest 
   select (height_cm, case_control, ant_species) |> 
-  # filter to only include ant species C. mimosae, C. sjostedti, and C. nigriceps
+  # filter to only include ant species C. mimosae, C. sjostedti, 
+  # and C. nigriceps
   filter (ant_species %in% c ("AB", "RRB", "BBR")) |> 
-  # relevel ant species to be in the following order: 1) C. sjostedti, 2) C. mimosae, 3) C. nigriceps
+  # relevel ant species to be in the following order: 1) C. sjostedti, 
+  # 2) C. mimosae, 3) C. nigriceps
   mutate (ant_species = fct_relevel (ant_species, "AB", "RRB", "BBR")) |> 
   # create a new column to store the full scientific name for each ant species
   mutate (scientific_name = case_when (
@@ -99,8 +101,8 @@ The response variable case_control is binomial and looks at whether a tree conta
 
 ## c. Purpose of study
 
-- Tree height is a continuous predictor variable that is measured in cm. As tree height increases, the probability of nest occurrence most likely increases because the birds will be able to nest farther away from potential predators on the ground (Abstract & Intro pragraph 1).
-- Acacia ant species is a categorical predictor variable with 3 levels: Crematogaster sjostedti (AB), Crematogaster mimosae (RRB), and Crematogaster nigriceps (BBR). It could influence the probabilty of birds nesting in the tree because some ant species are symbiont ants tolerating nesting birds, but other ant species can be hostile to "browsing animals" (introduction, paragraph 4).
+- Tree height is a continuous predictor variable that is measured in cm. As tree height increases, the probability of nest occurrence most likely increases because the birds will be able to nest farther away from potential predators on the ground (introduction, pragraph 1, 3-4).
+- Acacia ant species is a categorical predictor variable with 3 levels: *Crematogaster sjostedti* (AB), *Crematogaster mimosae* (RRB), and *Crematogaster nigriceps* (BBR). It could influence the probabilty of birds nesting in the tree because some ant species are symbiont ants tolerating nesting birds as well as other predators, and other ant species can be hostile to "browsing animals" and predators (introduction, paragraph 2-3).
 
 ## d. Table of models
 
@@ -181,7 +183,8 @@ There are randomly arranged residuals across the range of predicted values. Ther
 
 # new object called nests preds
 nests_preds <- ggpredict (model2, # model2 object
-                          terms = c("height_cm [all]", "ant_species")) |> # prediction
+                          # prediction variables
+                          terms = c("height_cm [all]", "ant_species")) |> 
   rename(height_cm = x,
          ant_species = group)
                           
@@ -256,15 +259,24 @@ ggplot( data = nests_clean,
 
 ## i. Write a caption for your figure.
 
-Figure 1
+**Figure 1: The probability of a bird nest occurring in a tree increases as tree height increases across all 3 ant species presence.** The figure visualizes how the probability of nest presence (y-axis) is predicted by tree height in "cm" (x-axis) interacting with ant species (seperate panels). Open cirlces represent individual observation of binary presence or absence of tree nests on trees of a certain height, seperated by ant species. Colors correspond to ant species, Red panel: "*Crematogaster sjostedti*", green panel: "*Crematogaster mimosae*", blue panel: "*Crematogaster nigriceps*". Data sourced from: Cre Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: *Symbiotic acacia ants drive nesting behavior by birds in an African savanna* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
 
 ## j. Calculate model predictions
 
+```{r}
+#| label: calculated_model_predictions
+
+# what is the probability of nest occurrence at a value of 600 cm for each 
+# ant_species
+ggpredict(model2,
+terms = c("height_cm [600]", "ant_species"))
+
+```
 
 
 ## k. Interpret your results
 
-
+The predicted probability of nest site occupancy at 600 cm (the tallest tree) is less for *Crematogaster sjostedti* (0.20 (95% CI [0.00, 0.99])) and *Crematogaster mimosae* (0.74 (95% CI [0.48, 0.90])) than for *Crematogaster nigriceps* (1.00 (95% CI [1.00, 1.00])). There is a 100% probability that nests will occur in trees at height 600 cm with the ant species *Crematogaster nigriceps* present. Additionally, the probability of a bird nest occurring in a tree increases as tree height increases across all 3 ant species presence. Birds had a higher probability to nest in trees inhabited by aggressive defenders of host trees (*C.nigriceps* and *C.mimosae*), but rarely nested in trees that are inhabited by less aggressive defenders (*C.sjostedti*) (Figure 1). Nesting sites that are inhabited by more aggressive ant species can reduce the risk of nest predation (Lujan et al., 2023, Young et al., 1990).
 
 # Problem 3. Affective and exploratory visualizations
 
@@ -341,7 +353,8 @@ My data has independent observations. Each individual observation is independent
 #| label: fit_bike_model
 
 # create new object for bike commute
-bike_commute_model <- lm (duration_m ~ time_before_class_min, # duration as a function of time before class
+# duration as a function of time before class
+bike_commute_model <- lm (duration_m ~ time_before_class_min, 
                           data = bike_commute_clean) # data: bike_commute_clean
 
 ```
