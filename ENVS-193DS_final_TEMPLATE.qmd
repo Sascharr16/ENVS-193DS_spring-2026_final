@@ -2,7 +2,12 @@
 title: "ENVS 193DS - Spring Final"
 author: "Sascha Roberts"
 date: "2026-06-09"
-format: pdf
+format:
+  pdf:
+    toc: true # use this to display a table of contents
+execute:
+  message: false # use this to make sure messages don't show up
+  warning: false # use this to make sure warnings don't show upl
 ---
 
 # Github Repo
@@ -35,6 +40,7 @@ library (DHARMa)
 #| label: load_data
 #| message: false
 
+# create object for nest data
 nests <- read.csv (here("data", "nest_data_final.csv"))
 # create object for bike commute data
 bike_commute <- read.csv(here("data", "ENVS_193DS_Personal_Data.csv"))
@@ -45,15 +51,19 @@ bike_commute <- read.csv(here("data", "ENVS_193DS_Personal_Data.csv"))
 
 ## a. Transparent statistical methods
 
-In part 1, my coworker used _______. In part 2, they used _______.
+In **part 1**, my coworker used a linear model (linear regression) to perform their analysis.The response variable is  binary and reflects the probability that the American Avocet uses the mirco habit (1) or doesn’t (0). The predictor is a continuous variable describing the distance to water edge (m). 
+
+In **part 2**, they used a chi-squared test for analysis to determine whether there is a relationship between two categorical variables. There categorical variables are bird species (American Avocet, Forster’s Tern, Black-necked Stilt) and habitat type (managed pond, non-tidal marsh, salt pond, tidal marsh, tidal mudflat). 
 
 ## b. Suggestions for rewriting
 
+**Part 1:** The data suggests that American Avocets are more likely to use micro habitats that are closer to the water’s edge. We can reject our null hypothesis because the data shows a strong relationship that is unlikely due to random chance.
 
+**Part 2:** The three shorebird species used the five habitat types in unequal proportions. The species showed a clear pattern of habitat preference which are unlikely to appear solely from random chance.
 
 ## c. Further analysis
 
-
+Another variable that could influence the probability of American Avocet micro habitat use, is Salinity (ppt) which is a continuous variable that can be measured with a salinity meter. It might have an impact on micro-habitat use because salinity influences the composition and abundance of aquatic invertebrates which serve as prey for Avocets and therefore could predict Avocet distribution.
 
 # Problem 2. Data analysis
 
